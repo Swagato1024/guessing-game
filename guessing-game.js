@@ -1,7 +1,8 @@
 const net = require("node:net");
-const server = net.createServer();
+const guessGame = net.createServer();
+const assistant = net.createServer();
 
-const verifyGuess = (socket, guess, correctAns, attempts) => {
+const verifyGuess = (socket, guess, correctAns) => {
   if (guess === correctAns) {
     socket.write(`CORRECT GUESS\n`);
     socket.end();
@@ -16,7 +17,7 @@ const verifyGuess = (socket, guess, correctAns, attempts) => {
   socket.write(respose);
 };
 
-server.on("connection", (socket) => {
+guessGame.on("connection", (socket) => {
   socket.write("Guess a number: ");
 
   const correctAns = Math.floor(Math.random() * 1000);
@@ -26,8 +27,13 @@ server.on("connection", (socket) => {
 
   socket.on("data", (guess) => {
     attempts++;
-    verifyGuess(socket, +guess, correctAns, attempts);
+    if (attempts > 5) {
+      socket.write("Chances Over ");
+      socket.end();
+      return;
+    }
+    verifyGuess(socket, +guess, correctAns);
   });
 });
 
-server.listen(8000);
+guessGame.listen(8000);

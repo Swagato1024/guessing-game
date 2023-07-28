@@ -21,8 +21,7 @@ class Assistant {
     if (hint.high) {
       this.#upperBound = this.#Prevguess;
       guess = this.#makeSuggestion();
-    } 
-    else if (hint.low) {
+    } else if (hint.low) {
       this.#lowerBound = this.#Prevguess;
       guess = this.#makeSuggestion();
     }
@@ -34,12 +33,14 @@ class Assistant {
   makeFirstGuess() {
     const guess = this.#makeSuggestion(this.#lowerBound, this.#upperBound);
     this.#Prevguess = guess;
+
+    return guess;
   }
 }
 
 const getHint = (respose) => JSON.parse(respose);
 
-const assistant = new Assistant(1, 1024);
+const assistant = new Assistant(1, 100);
 
 const player = net.createConnection({ port: 8000 });
 
@@ -51,7 +52,10 @@ player.on("connect", () => {
     const hint = getHint(respose);
     console.log(hint);
 
-    if (hint.isOver) return;
+    if (hint.isOver) {
+      player.end();
+      return;
+    }
 
     const guess = assistant.suggest(hint);
     player.write(`${guess}`);

@@ -49,15 +49,19 @@ player.on("connect", () => {
   player.write(`${guess}`);
 
   player.on("data", (respose) => {
-    const hint = getHint(respose);
-    console.log(hint);
+    setTimeout(() => {
+      const hint = getHint(respose);
 
-    if (hint.isOver) {
-      player.end();
-      return;
-    }
+      console.log(hint);
 
-    const guess = assistant.suggest(hint);
-    player.write(`${guess}`);
+      if (hint.isOver) {
+        console.log("game Over");
+        player.end();
+        return;
+      }
+
+      const guess = assistant.suggest(hint);
+      player.write(`${guess}`);
+    }, 1200);
   });
 });
